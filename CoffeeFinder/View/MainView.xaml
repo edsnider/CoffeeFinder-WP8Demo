@@ -1,0 +1,65 @@
+﻿<phone:PhoneApplicationPage
+    x:Class="CoffeeFinder.View.MainView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="clr-namespace:CoffeeFinder.Converters"
+    DataContext="{Binding Main, Source={StaticResource Locator}}"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    mc:Ignorable="d"
+    shell:SystemTray.IsVisible="True">
+
+    <phone:PhoneApplicationPage.Resources>
+        <converters:StarbucksHighlightConverter x:Name="StarbucksHighlightConverter" />
+        <converters:IsBusyDisabledConverter x:Name="IsBusyDisabledConverter" />
+        <converters:IsBusyVisibleConverter x:Name="IsBusyVisibleConverter" />
+    </phone:PhoneApplicationPage.Resources>
+    
+    <!--LayoutRoot is the root grid where all page content is placed-->
+    <Grid x:Name="LayoutRoot" Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!--TitlePanel contains the name of the application and page title-->
+        <StackPanel Grid.Row="0" Margin="12,17,0,28">
+            <TextBlock Text="{Binding ViewTitle}" Style="{StaticResource PhoneTextNormalStyle}"/>
+        </StackPanel>
+
+        <!--ContentPanel - place additional content here-->
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="80" />
+            </Grid.RowDefinitions>
+            <ProgressBar VerticalAlignment="Center" IsIndeterminate="True"
+                     Visibility="{Binding IsBusy, Mode=TwoWay, Converter={StaticResource IsBusyVisibleConverter}}"/>
+            <phone:LongListSelector x:Name="lls_venues"
+                                    ItemsSource="{Binding Venues, Mode=TwoWay}">
+                <phone:LongListSelector.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="12,20,0,0">
+                            <TextBlock Text="{Binding Name}"
+                                       Foreground="{Binding Name, Converter={StaticResource StarbucksHighlightConverter}}"/>
+                            <TextBlock>
+                                <Run Text="{Binding Address.Address}" />
+                                <Run Text="{Binding Address.City}" />
+                                <Run Text="{Binding Address.State}" />
+                            </TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </phone:LongListSelector.ItemTemplate>
+            </phone:LongListSelector>
+            
+            <Button Grid.Row="1" Content="Refresh" Command="{Binding RefreshVenuesCommand}" IsEnabled="{Binding IsBusy, Mode=TwoWay, Converter={StaticResource IsBusyDisabledConverter}}" />
+        </Grid>
+    </Grid>
+
+</phone:PhoneApplicationPage>
